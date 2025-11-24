@@ -6,29 +6,41 @@
 \usage{
 emsemble_result_with_weight(
   model_list,
-  df_list,
+  df,
   index,
   weight_list,
-  positive,
+  target_treatment = "none"
+)
+
+emsemble_result_with_weight(
+  model_list,
+  df,
+  index,
+  weight_list,
   target_treatment = "none"
 )
 }
 \arguments{
-\item{model_list}{List of models}
+\item{model_list}{List of fitted regression models.}
+
+\item{df}{Data frame used for prediction.}
+
+\item{index}{Integer vector of row indices for prediction.}
+
+\item{weight_list}{List or numeric vector of model weights.}
+
+\item{target_treatment}{Transformation used on target (if any).}
 
 \item{df_list}{List of data frames or single data frame}
 
-\item{index}{Indices to predict}
-
-\item{weight_list}{List of weights}
-
 \item{positive}{Positive label}
-
-\item{target_treatment}{Transformation flag}
 }
 \value{
 Numeric vector of weighted ensemble probabilities
+
+Numeric vector of ensemble predictions.
 }
 \description{
-Weighted ensemble prediction
+Combines multiple regression models using weights, to produce an ensemble
+prediction for a given index set.
 }

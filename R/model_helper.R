@@ -247,3 +247,101 @@ cross_validation <- function(df, index_list,
       "%, true negative rate is", tnr_overall,
       "% and F1 is", F1_overall,".\n")
 }
+
+#' Backward Elimination for Multiple Linear Regression
+#'
+#' Performs backward selection based on p-values for multiple linear regression
+#' models, optionally for an ensemble of training index sets.
+#'
+#' @param df Data frame containing predictors and target.
+#' @param train_index Either a numeric vector of row indices, or a list of
+#'   such vectors for ensemble models.
+#' @param target_col Name of the target column.
+#'
+#' @return Either a single \code{lm} model or a list of \code{lm} models.
+#' @export
+backward_p_mlr <- function(df, train_index, target_col) {
+
+  if (is.list(train_index)) {
+
+    regression_model <- list()
+    for (i in 1:length(train_index)) {
+
+      index <- unlist(train_index[[i]])
+
+      regression_model[[i]] <- stats::lm(
+        stats::as.formula(paste(target_col, "~ .")),
+        data = df[index, ],
+        na.action = stats::na.omit
+      )
+
+      coeffecient <- summary(regression_model[[i]])$coefficients
+      p_values    <- coeffecient[-1, "Pr(>|t|)"]
+
+      if (max(p_values, na.rm = TRUE) > 0.05) {
+        repeat {
+          significant_feature <- names(p_values[p_values < 0.05])
+          string_features <- stats::as.formula(
+            paste(target_col, "~", paste(significant_feature, collapse = "+"))
+          )
+          regression_model[[i]] <- stats::lm(
+            string_features,
+            data = df[index, ],
+            na.action = stats::na.omit
+          )
+
+          coeffecient <- summary(regression_model[[i]])$coefficients
+          p_values    <- coeffecient[-1, "Pr(>|t|)"]
+
+          if (all(is.na(p_values))) {
+            cat("All p-values are NA, this model is not working")
+            break
+          }
+
+          if (max(p_values, na.rm = TRUE) < 0.05) break
+        }
+      }
+    }
+  }
+
+  if (is.numeric(train_index)) {
+
+    index <- train_index
+
+    regression_model <- stats::lm(
+      stats::as.formula(paste(target_col, "~ .")),
+      data = df[index, ],
+      na.action = stats::na.omit
+    )
+
+    coeffecient <- summary(regression_model)$coefficients
+    p_values    <- coeffecient[-1, "Pr(>|t|)"]
+
+    if (max(p_values, na.rm = TRUE) > 0.05) {
+
+      repeat {
+        significant_feature <- names(p_values[p_values < 0.05])
+        string_features <- stats::as.formula(
+          paste(target_col, "~", paste(significant_feature, collapse = "+"))
+        )
+        regression_model <- stats::lm(
+          string_features,
+          data = df[index, ],
+          na.action = stats::na.omit
+        )
+
+        coeffecient <- summary(regression_model)$coefficients
+        p_values    <- coeffecient[-1, "Pr(>|t|)"]
+
+        if (all(is.na(p_values))) {
+          cat("All p-values are NA, this model is not working")
+          break
+        }
+
+        if (max(p_values, na.rm = TRUE) < 0.05) break
+      }
+    }
+  }
+
+  return(regression_model)
+}

@@ -121,10 +121,12 @@ kNN_Imputation <- function(df, smallest_k, target_feature, df_distance){
 #' Automation kNN imputation for all columns with NA
 #'
 #' @param df Data frame
+#' @param test_por Portion of Data Set that will be used to test best k
+#' @param max_k Maximum number of k test for best k
 #' @param ignore_col Character vector of columns to ignore
 #' @return Data frame with selected columns imputed
 #' @export
-automation_knn_imputation <- function(df, ignore_col = NULL) {
+automation_knn_imputation <- function(df, test_por=0.1, max_k=20, ignore_col = NULL) {
 
   na_col_name <- names(df)[colSums(is.na(df)) > 0]
 
@@ -136,9 +138,9 @@ automation_knn_imputation <- function(df, ignore_col = NULL) {
     target_feature <- df[[i]]
     df_distance    <- initialize_distance_find_best_k(df)
     not_na_index   <- initialize_not_na_index(target_feature)
-    test_k_index   <- initialize_test_k_index(888, 0.1, not_na_index)
+    test_k_index   <- initialize_test_k_index(888, test_por, not_na_index)
     cat("Now is processing column", i, "\n")
-    smallest_k     <- find_best_k(20, test_k_index, df_distance,
+    smallest_k     <- find_best_k(max_k, test_k_index, df_distance,
                                   not_na_index, target_feature)
     df[[i]]        <- kNN_Imputation(df, smallest_k, target_feature,
                                      df_distance)

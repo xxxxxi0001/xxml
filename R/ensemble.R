@@ -215,3 +215,102 @@ emsemble_result_with_weight <- function(model_list, df_list,
 
   return(ensemble_predictions)
 }
+
+#' Reverse Numeric Transformation
+#'
+#' Applies the inverse of a transformation to a numeric vector.
+#'
+#' @param x Numeric vector.
+#' @param treatment One of \code{"log"}, \code{"log1p"}, \code{"sqrt"},
+#'   \code{"square"}, \code{"none"}.
+#'
+#' @return Numeric vector with inverse transformation applied.
+#' @export
+reverse_num <- function(x, treatment) {
+  if (tolower(treatment) == "log") {
+    return(exp(x))
+  }
+  if (tolower(treatment) == "log1p") {
+    return(exp(x) - 1)
+  }
+  if (tolower(treatment) == "sqrt") {
+    return(x^2)
+  }
+  if (tolower(treatment) == "square") {
+    return(sqrt(x))
+  }
+  if (tolower(treatment) == "none") {
+    return(x)
+  }
+}
+
+#' Compute Ensemble Weights Based on RMSE
+#'
+#' Uses RMSE from a validation/test set to assign weights to each model in
+#' an ensemble: smaller RMSE implies larger weight.
+#'
+#' @param model_list List of regression models.
+#' @param df Data frame used for prediction.
+#' @param test_index Integer vector of row indices used as test set.
+#' @param target_col Name of the target column.
+#' @param target_treatment Transformation used on target:
+#'   \code{"log"}, \code{"log1p"}, \code{"sqrt"}, \code{"square"}, \code{"none"}.
+#'
+#' @return A list of numeric weights (summing to 1).
+#' @export
+ensemble_weight_RMSE <- function(model_list, df, test_index, target_col, target_treatment = "none") {
+
+  prediction  <- list()
+  rmse        <- numeric(length(model_list))
+  weight_list <- numeric(length(model_list))
+
+  for (i in 1:length(model_list)) {
+    prediction[[i]] <- stats::predict(model_list[[i]], df[test_index, ])
+    real_value      <- df[[target_col]][test_index]
+    prediction_value <- prediction[[i]]
+
+    if (tolower(target_treatment) != "none") {
+      real_value      <- reverse_num(real_value, target_treatment)
+      prediction_value <- reverse_num(prediction_value, target_treatment)
+    }
+
+    rmse[i] <- sqrt(mean((real_value - prediction_value)^2))
+    cat("The model", i, "'s RMSE is", round(rmse[i], 3), "\n")
+  }
+
+  weight_list <- (1 / rmse^2) / sum(1 / rmse^2)
+  cat("Each of their weight are", round(as.numeric(weight_list), 3), ".")
+
+  return(as.list(weight_list))
+}
+
+#' Weighted Ensemble Predictions (Regression)
+#'
+#' Combines multiple regression models using weights, to produce an ensemble
+#' prediction for a given index set.
+#'
+#' @param model_list List of fitted regression models.
+#' @param df Data frame used for prediction.
+#' @param index Integer vector of row indices for prediction.
+#' @param weight_list List or numeric vector of model weights.
+#' @param target_treatment Transformation used on target (if any).
+#'
+#' @return Numeric vector of ensemble predictions.
+#' @export
+emsemble_result_with_weight <- function(model_list, df, index, weight_list, target_treatment = "none") {
+
+  prediction_val <- list()
+
+  for (i in 1:length(model_list)) {
+    prediction_val[[i]] <- stats::predict(model_list[[i]], df[index, ])
+    prediction_val[[i]] <- prediction_val[[i]] * weight_list[[i]]
+  }
+
+  ensemble_predictions <- Reduce("+", prediction_val)
+
+  if (tolower(target_treatment) != "none") {
+    ensemble_predictions <- reverse_num(ensemble_predictions, target_treatment)
+  }
+
+  return(ensemble_predictions)
+}

@@ -4,10 +4,14 @@
 \alias{automation_knn_imputation}
 \title{Automation kNN imputation for all columns with NA}
 \usage{
-automation_knn_imputation(df, ignore_col = NULL)
+automation_knn_imputation(df, test_por = 0.1, max_k = 20, ignore_col = NULL)
 }
 \arguments{
 \item{df}{Data frame}
+
+\item{test_por}{Portion of Data Set that will be used to test best k}
+
+\item{max_k}{Maximum number of k test for best k}
 
 \item{ignore_col}{Character vector of columns to ignore}
 }

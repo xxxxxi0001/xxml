@@ -164,3 +164,42 @@ k_stratified_cv <- function(k, df, target_col, train_index,
   }
   return(index_list)
 }
+
+#' Split Data into Train, Test, and Validation Sets (No Target Stratification)
+#'
+#' Randomly splits a data frame into train, test, and validation sets using
+#' specified proportions, without stratifying by any target.
+#'
+#' @param df A data frame.
+#' @param seed_num Integer seed for reproducibility.
+#' @param train_portion Proportion of rows used for training.
+#' @param test_portion Proportion of rows used for testing (of total rows;
+#'   the remaining go to validation).
+#'
+#' @return A list with elements \code{train_index}, \code{test_index},
+#'   and \code{validation_index}.
+#' @export
+three_set_partition_no_target <- function(df, seed_num, train_portion, test_portion) {
+
+  set.seed(seed_num)
+
+  n <- nrow(df)
+
+  train_size <- floor(n * train_portion)
+  train_index <- sample(1:n, size = train_size)
+
+  rest_index <- setdiff(1:n, train_index)
+
+  nr       <- length(rest_index)
+  test_num <- test_portion / (1 - train_portion)
+  test_size <- floor(nr * test_num)
+  test_index <- sample(rest_index, size = test_size)
+
+  validation_index <- setdiff(setdiff(1:n, train_index), test_index)
+
+  return(list(
+    train_index      = train_index,
+    test_index       = test_index,
+    validation_index = validation_index
+  ))
+}
