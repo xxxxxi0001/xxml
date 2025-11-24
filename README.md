@@ -3,6 +3,7 @@ This package is designed to support **classification modeling pipelines**,
 ### Install from GitHub
 
 install.packages("devtools")
+
 devtools::install_github("xxxxxi0001/xxml")
 
 ## ✨ Features
