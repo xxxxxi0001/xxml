@@ -1,5 +1,9 @@
 This package is designed to support **classification modeling pipelines**,  
 
+### Install from GitHub
+
+install.packages("devtools")
+devtools::install_github("xxxxxi0001/xxml")
 
 ## ✨ Features
 
@@ -44,13 +48,6 @@ Support for:
 - `emsemble_result_with_weight()` — weighted ensemble prediction
 
 ---
-
-## Installation
-
-### Install from GitHub
-
-install.packages("devtools")
-devtools::install_github("xxxxxi0001/xxml")
 
 ## Usage Example
 
