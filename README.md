@@ -4,8 +4,6 @@ An R package for **data cleaning**, **feature engineering**, **kNN imputation**,
 **ensemble learning with threshold & F1-based weights**.
 
 This package is designed to support **classification modeling pipelines**,  
-especially for datasets similar to **Heart Disease Prediction**,  
-but the tools are general-purpose and flexible.
 
 ---
 
