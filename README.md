@@ -1,6 +1,6 @@
 This package is designed to support **classification modeling pipelines**,  
 
-### Install from GitHub
+## Install from GitHub
 
 install.packages("devtools")
 
