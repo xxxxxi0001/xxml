@@ -1,4 +1,4 @@
-This package is designed to support **classification modeling pipelines**,  
+This package is designed to support **classification modeling pipelines**
 
 ## ✨ Install from GitHub
 
