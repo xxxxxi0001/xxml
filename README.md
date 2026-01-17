@@ -54,36 +54,38 @@ Support for:
 
 library(xxml)
 
-# Load your data
+### Load your data
 df <- read.csv("your_data.csv")
 
-# Basic NA / zero check
+### Basic NA / zero check
 check_na_zero(df)
 
-# Convert zero to NA for Cholesterol
+### Convert zero to NA for Cholesterol
 df <- replace_na_with_zero(df, ignore_cols = "Oldpeak")
 
-# Median imputation for RestingBP
+### Median imputation for RestingBP
 df <- median_imputation(df, "RestingBP")
 
-# Automatic kNN imputation for all NA columns
+### Automatic kNN imputation for all NA columns
 df <- automation_knn_imputation(df)
 
-# Outlier treatment
+### Outlier treatment
 df <- z_score_outlier(df, c("Age", "RestingBP", "MaxHR"))
 
-# Partition dataset (50% train, 25% test, 25% val)
+### Partition dataset (50% train, 25% test, 25% val)
 parts <- three_set_partition(df, 888, "HeartDisease", 0.5, 0.25, 1, 0)
 
 train_index <- parts$train_index
+
 test_index  <- parts$test_index
+
 val_index   <- parts$validation_index
 
-# Fit logistic regression backward p
+### Fit logistic regression backward p
 log_models <- backward_p_lr(df, train_index, "HeartDisease", 1, 1, 1)
 
-# Ensemble prediction
+### Ensemble prediction
 pred <- make_ensemble_predict(log_models, df, test_index, positive = 1)
 
-# Evaluate
+### Evaluate
 check_model_performance(pred, 0.5, 1, 0, df, test_index, "HeartDisease")
