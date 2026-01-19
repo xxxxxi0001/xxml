@@ -188,22 +188,27 @@ prediction<-emsemble_result_with_weight(mlr_list,df_encoded,validation_index,wei
 
 ### Check Result with RMSE & Correlation & Plot
 real_value<-exp(df_encoded[["DONATION_AMT_log"]][validation_index])
+
 rmse<-sqrt(mean((real_value-prediction)^2))
 
 correlation<-cor(prediction,real_value)
 
 plot(prediction,real_value)
+
 abline(0,1, col=2)
 
 ### Stack
 stack_model<-create_stack_model_mlr(df_encoded,"DONATION_AMT_log",test_index,mlr_list)
+
 result<-stack_test_mlr(stack_model,mlr_list,df_encoded,validation_index,"DONATION_AMT_log","log")
 
 ### Check Stack Result (Correlation, plot)
 prediction_value<-result$prediction_value
+
 true_value<-result$true_value
 
 correlation<-cor(prediction_value,true_value)
 
 plot(prediction_value,true_value)
+
 abline(0,1, col=2)
