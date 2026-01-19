@@ -6,6 +6,9 @@ install.packages("devtools")
 
 devtools::install_github("xxxxxi0001/xxml")
 
+## ✨ Author E-mail
+zhang.xi6@northeastern.edu
+
 ## ✨ Features
 
 ### One Step Data Cleaning 
