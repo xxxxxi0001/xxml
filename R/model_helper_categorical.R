@@ -92,7 +92,7 @@ check_class_imbalance<-function(df,index_list,target_col,positive,negative) {
 #' @param target_treatment If target feature is transformed in feature transformation (default="none")
 #' @return No Return, but will output result
 #' @export
-make_ensemble_predict<-function (model_list,df_list,test_index,positive,target_treatment="none") {
+make_ensemble_predict_categorical<-function (model_list,df_list,test_index,positive,target_treatment="none") {
   
   # Initialization
   prediction_list<-vector("list",length(model_list))
