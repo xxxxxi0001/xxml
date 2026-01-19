@@ -138,3 +138,28 @@ three_set_partition_no_target<-function(df, train_portion, test_portion){
     validation_index=validation_index
   ))
 }
+
+#' Create Ensmeble Data Set with No Target (for numerical prediction)
+#' 
+#' @param df 
+#' @param train_index
+#' @param sub_num
+#' @param sub_portion 
+#' @return A list contain sub_num number of training index
+#' @export 
+ensemble_train_partition_no_target<-function(df,train_index,sub_num,sub_portion) {
+
+  # Initialization for index storage
+  partitions<-list()
+  
+  # Randomly choose designated number (sub_num) of subset from training index 
+  # with designated portion (sub_portion) of number
+  for (i in 1:sub_num){
+    nt<-length(train_index)
+    subset_train_index<-sample(train_index,size=floor(sub_portion*nt))
+    partitions[[i]]<-list(train=subset_train_index)
+  }
+  
+  # Return a list of partition index
+  return(partitions)
+}
