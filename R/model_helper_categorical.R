@@ -283,6 +283,7 @@ ensemble_weight_F1<-function(model_list, df_list,test_index, best_threshold, tar
 #' @param index The index you wanna try with this model (usually test & val index)
 #' @param weight_list The weight you get for each ensemble
 #' @param positive Target's positive value
+#' @param target_treatment If target feature is transformed in feature transformation (default="none")
 #' @return List of prediction (in probability) made with ensemble Logistic Regression model
 #' @export
 ensemble_result_with_weight<-function(model_list,df_list,index,weight_list,positive,target_treatment="none") {
