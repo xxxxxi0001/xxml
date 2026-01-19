@@ -185,3 +185,152 @@ find_best_threshold<-function (predict_prob, df,test_index, target_col, positive
   return(best_threshold)
 }
 
+#' Get Each Ensemble Model Weight with F1
+#'
+#' @param model_list The list of model, support logistic regression, C5.0, rpart, random forest
+#' @param df_list The list of data frame align with model_list
+#' @param test_index The index of 25% testing
+#' @param best_threshold The best threshold you get after run function "find_best_threshold"
+#' @param target_col The target column that need to make prediction
+#' @param positive Target positive value
+#' @param negative Target negative value
+#' @return Each Ensemble Model's Weight
+#' @export
+ensemble_weight_F1<-function(model_list, df_list,test_index, best_threshold, target_col, positive, negative) {
+  
+  # Initialize a list to store F1 value
+  F1_list<-list()
+  
+  # Initialization
+  prediction_list<-vector("list",length(model_list))
+  
+  # If the list of model only has one set of data frame
+  # make replication so its a list of data frame
+  if (inherits(df_list,"data.frame")) {
+    df_list <- rep(list(df_list), length(model_list))
+  }
+  
+  # send warning if model list & data frame list is not same length
+  if (length(model_list) != length(df_list)) {
+    stop("Model List and Data Frame List must be equal number")
+  }
+  
+  # Loop over all ensemble model
+  for (i in 1:length(prediction_list)) {
+    model<-model_list[[i]]
+    df<-df_list[[i]]
+    
+    # if is logistic regression, make prediction with type response
+    # and get its model type for output result
+    if (inherits(model, "glm")) {
+      prediction_list[[i]]<-predict(model_list[[i]], df[test_index,], type="response")
+      model_type<-"Logistic Regression"
+    }
+    
+    # if belongs to tree prediction, use probability make prediction and
+    else if (inherits(model, "randomForest") || inherits(model, "C5.0") || inherits(model,"rpart")) {
+      prediction_list[[i]]<-predict(model, df[test_index,], type="prob")[, as.character(positive)]
+      
+      # get their model type for output result
+      if (inherits(model,"randomForest")) {
+        model_type<-"Random Forest"
+      }
+      else if (inherits(model,"C5.0")) {
+        model_type<-"C5.0"
+      }
+      else if (inherits(model,"rpart")) {
+        model_type<-"Decision Tree"
+      }
+    }
+    
+    # if other model type appeared, halt function and send suggestion
+    else {
+      stop("Only support logistic regression, randomForest, C5.0, rpart")
+    }
+  
+  # get prediction value with best threshold & its true value
+  prediction<-ifelse(prediction_list[[i]] >= best_threshold,positive,negative)
+  real_value<-as.numeric(as.character(df[[target_col]][test_index]))
+    
+  # Calculate F1 with true value and predicted value and get it into list
+  TP<-sum(prediction==positive&real_value==positive)
+  FP<-sum(prediction==positive&real_value==negative)
+  FN<-sum(prediction==negative&real_value==positive)
+  precision<-TP/(TP+FP)
+  recall<-TP/(TP+FN)
+  F1<-2*(precision*recall)/(precision+recall)
+  F1_list[[i]]<-F1
+  
+  # out put result
+  cat("The model",model_type, i,"'s F1 is",round(F1_list[[i]],3),"\n")
+  }
+  
+  # Calculate weight and get it into list
+  F1_vector<-unlist(F1_list)
+  F1_weights<-F1_vector/sum(F1_vector)
+  weight_list<-as.list(F1_weights)
+  
+  # output weight result
+  cat("Each of their weight are",round(as.numeric(weight_list),3),".")
+  
+  return(weight_list)
+}
+
+#' Support Logistic Regression, random forest, C5.0, rpart
+#'
+#' @param model_list The list of model, support logistic regression, C5.0, rpart, random forest
+#' @param df_list The list of data frame align with model_list
+#' @param index The index you wanna try with this model (usually test & val index)
+#' @param weight_list The weight you get for each ensemble
+#' @param positive Target's positive value
+#' @return List of prediction (in probability) made with ensemble Logistic Regression model
+#' @export
+ensemble_result_with_weight<-function(model_list,df_list,index,weight_list,positive,target_treatment="none") {
+  
+  # If the list of model only has one set of data frame
+  # make replication so its a list of data frame
+  if (inherits(df_list,"data.frame")) {
+    df_list <- rep(list(df_list), length(model_list))
+  }
+  
+  # Check if model, weight and data frame are in same length, sending warning if not
+  if (length(model_list) != length(weight_list)) {
+    stop("Model List and Weight List must be equal number")
+  }
+  else if (length(model_list) != length(df_list)) {
+    stop("Model List and Data Frame List must be equal number")
+  }
+  
+  # Initialization
+  prediction_list<-vector("list",length(model_list))
+  
+  # For each model in ensemble model, make prediction
+  # if is logistic regression, make prediction with response
+  # if is tree prediction, make prediction with probability
+  # if other model appeared, halt function & send suggestion
+  for (i in seq_along(model_list)) {
+    model<-model_list[[i]]
+    df<-df_list[[i]]
+    if (inherits(model, "glm")) {
+      prediction_list[[i]]<-predict(model, df[index,], type="response")
+      prediction_list[[i]]<-prediction_list[[i]]*weight_list[[i]]
+    }
+    else if (inherits(model, "randomForest") || inherits(model, "C5.0") || inherits(model,"rpart")) {
+      prediction_list[[i]]<-predict(model, df[index,], type="prob")[, as.character(positive)]
+      prediction_list[[i]]<-prediction_list[[i]]*weight_list[[i]]
+    }
+    else {
+      stop("Only support logistic regression, randomForest, C5.0, rpart")
+    }
+  }
+  
+  # Add up as final prediction value
+  ensemble_predictions<-Reduce("+",prediction_list)
+  
+  # Calculate ensemble model's mean as final prediciton value
+  if (tolower(target_treatment)!="none") {
+    ensemble_predictions<-reverse_num(ensemble_predictions,target_treatment)
+  }
+  
+  return(ensemble_predictions)
+}
