@@ -8,7 +8,7 @@ devtools::install_github("xxxxxi0001/xxml")
 
 ## ✨ Features
 
-### One Step Data Cleaning
+### One Step Data Cleaning 
 - `automate_data_cleaning` — One step outlier & NA treatment based on distribution & portion of NA
 
 ### Data Cleaning Utilities
