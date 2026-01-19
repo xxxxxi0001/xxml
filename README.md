@@ -169,9 +169,13 @@ onehot_df<-as.data.frame(onehot_features)[,-1]
 
 ### Partition (50,25,25)
 set.seed(888)
+
 partition_result<-three_set_partition_no_target(df_encoded,0.5,0.25)
+
 train_index<-partition_result$train_index
+
 test_index<-partition_result$test_index
+
 validation_index<-partition_result$validation_index
 
 ### Construction with Backward p
