@@ -286,7 +286,7 @@ ensemble_weight_F1<-function(model_list, df_list,test_index, best_threshold, tar
 #' @param target_treatment If target feature is transformed in feature transformation (default="none")
 #' @return List of prediction (in probability) made with ensemble Logistic Regression model
 #' @export
-ensemble_result_with_weight<-function(model_list,df_list,index,weight_list,positive,target_treatment="none") {
+ensemble_result_with_weight_categorical<-function(model_list,df_list,index,weight_list,positive,target_treatment="none") {
   
   # If the list of model only has one set of data frame
   # make replication so its a list of data frame
