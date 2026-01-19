@@ -383,3 +383,71 @@ automation_knn_imputation<-function(df,test_por=0.1,max_k=20,ignore_col=NULL) {
   }
   return(df)
 }
+
+#' Automation Data Cleaning for all columns with NA
+#'
+#' @param df The data frame that need Data Cleaning (include outlier & NA value treated)
+#' @return Data frame that successfully cleaned
+#' @export
+automate_data_cleaning<-function(df) {
+  
+  # Initialize numerical columns & drop index
+  num_col<-which(sapply(df, is.numeric))
+  drop_index<-c()
+  
+  # For each numerical column
+  for (i in num_col) {
+    
+    # If na occurs less than 5%, na impute with median value
+    na_count <-sum(is.na(df[[i]]))
+    na_por<-na_count/nrow(df)
+    if (na_por<0.05 && na_por>0) {
+      df<-median_imputation(df,colnames(df)[i])
+    }
+    # If na occurs more then 30%, remove column
+    else if (na_por>0.3) {
+      drop_index<-c(drop_index, i)
+      cat("Feature",colnames(df)[i],"has more than 30% missing value, need to be droped")
+    }
+  }
+  if (length(drop_index)>0) {
+    df<-df[,-drop_index]
+  }
+  
+  # Recollect numerical column after feature with too many missing value droped
+  num_col<-which(sapply(df, is.numeric))
+  treat_col<-c()
+  
+  # If shapiro p smaller than 0.05 (not normally distributed)
+  # use IQR treatment for outliers
+  # otherwise (normally distributed) use z-score for outliers
+  for (i in num_col) {
+    if (sum(is.na(df[[i]]))==0) {
+      p<-shapiro.test(df[[i]])$p.value
+      if (p<0.05) {
+        df<-IQR_outlier(df,colnames(df)[i])
+        treat_col<-c(treat_col,i)
+      }
+      else {
+        df<-z_score_outlier(df,colnames(df)[i])
+        treat_col<-c(treat_col,i)
+      }
+    }
+  }
+  
+  # for result column with na, use kNN imputation
+  df<-automation_knn_imputation(df)
+  
+  n_treated_col<-setdiff(num_col,treat_col)
+  
+  for (i in n_treated_col) {
+    p<-shapiro.test(df[[i]])$p.value
+    if (p<0.05) {
+      df<-IQR_outlier(df,colnames(df)[i])
+    }
+    else {
+      df<-z_score_outlier(df,colnames(df)[i])
+    }
+  }
+  return(df)
+}
