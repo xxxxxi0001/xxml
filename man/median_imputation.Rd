@@ -7,12 +7,12 @@
 median_imputation(df, target_col)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{The data frame that has NA need median imputation treatment}
 
-\item{target_col}{Character vector of column names to impute}
+\item{target_col}{Columns name that need its NA be treated with median imputation}
 }
 \value{
-Data frame with NA imputed by median
+Data frame with designated column successfully impute
 }
 \description{
 Median imputation for selected columns

@@ -28,7 +28,7 @@ three_set_partition<-function(df, target_col, train_portion, test_portion,positi
   # Get rest index
   rest_p_i<-setdiff(p_index,p_train)
   rest_n_i<-setdiff(n_index,n_train)
-  
+
   # For rest
   nr_p<-length(rest_p_i)
   nr_n<-length(rest_n_i)
@@ -47,7 +47,7 @@ three_set_partition<-function(df, target_col, train_portion, test_portion,positi
   validation_index<-c(p_val,n_val)
   # shuffle
   validation_index<-sample(validation_index)
-  
+
   # Return train, test, validation index as a list
   return(list(
     train_index=train_index,
@@ -68,17 +68,17 @@ three_set_partition<-function(df, target_col, train_portion, test_portion,positi
 #' @return A list contain sub_num number of training index
 #' @export
 ensemble_train_partition<-function(df,train_index,sub_num,sub_portion,target_col,positive,negative) {
-  
+
   # Initialize a list to store partition index
   partitions<-vector("list",sub_num)
-  
+
   # Get train_index
   train_label<-df[[target_col]][train_index]
-  
+
   # Get positive negative's index
   positive_index<-train_index[train_label==positive]
   negative_index<-train_index[train_label==negative]
-  
+
   # Randomly choose designated number (sub_num) of subset from positive/negative
   # index with designated portion (sub_portion) of number
   # therefore it won't fall in class imbalance
@@ -87,11 +87,11 @@ ensemble_train_partition<-function(df,train_index,sub_num,sub_portion,target_col
     nt_n<-length(negative_index)
     subset_train_index_p<-sample(positive_index,size=floor(sub_portion*nt_p),replace=TRUE)
     subset_train_index_n<-sample(negative_index,size=floor(sub_portion*nt_n),replace=TRUE)
-    # clollect selected index in partition list with shuffle so positive/negative 
+    # clollect selected index in partition list with shuffle so positive/negative
     # won't cluster together
     partitions[[i]]<-sample(c(subset_train_index_p,subset_train_index_n))
   }
-  
+
   # Return a list of partition index
   return(partitions)
 }
@@ -112,25 +112,25 @@ three_set_partition_no_target<-function(df, train_portion, test_portion){
 
   # Initialize total size
   n<-nrow(df)
-  
+
   # Initialize train size
   train_size<-floor(n*train_portion)
-  
+
   # Get Train Index
   train_index<-sample(1:n,size=train_size)
-  
+
   # Get Rest Index
   rest_index<-setdiff(1:n, train_index)
-  
+
   # From rest, get test_index
   nr<-length(rest_index)
   test_num<-test_portion/(1-train_portion)
   test_size<-floor(nr*test_num)
   test_index<-sample(rest_index,size=test_size)
-  
+
   # Lest is validation
   validation_index<-setdiff(setdiff(1:n,train_index),test_index)
-  
+
   # Return train, test, validation index as a list
   return(list(
     train_index=train_index,
@@ -140,26 +140,26 @@ three_set_partition_no_target<-function(df, train_portion, test_portion){
 }
 
 #' Create Ensmeble Data Set with No Target (for numerical prediction)
-#' 
-#' @param df 
-#' @param train_index
-#' @param sub_num
-#' @param sub_portion 
+#'
+#' @param df Data frame that used for training partition
+#' @param train_index The overall training index that you gonna selected from
+#' @param sub_num Number of ensemble list
+#' @param sub_portion Portion of overall training you want to select as sub-list
 #' @return A list contain sub_num number of training index
-#' @export 
+#' @export
 ensemble_train_partition_no_target<-function(df,train_index,sub_num,sub_portion) {
 
   # Initialization for index storage
   partitions<-list()
-  
-  # Randomly choose designated number (sub_num) of subset from training index 
+
+  # Randomly choose designated number (sub_num) of subset from training index
   # with designated portion (sub_portion) of number
   for (i in 1:sub_num){
     nt<-length(train_index)
     subset_train_index<-sample(train_index,size=floor(sub_portion*nt))
     partitions[[i]]<-list(train=subset_train_index)
   }
-  
+
   # Return a list of partition index
   return(partitions)
 }

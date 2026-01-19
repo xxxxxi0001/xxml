@@ -7,9 +7,9 @@
 z_score_outlier(df, variable)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{The data frame that has feature need outlier treatment}
 
-\item{variable}{Character vector of numeric variable names}
+\item{variable}{Variables that need outlier treatment & normally}
 }
 \value{
 Data frame with extreme values capped at mean ± 3*sd

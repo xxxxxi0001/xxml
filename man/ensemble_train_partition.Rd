@@ -6,7 +6,6 @@
 \usage{
 ensemble_train_partition(
   df,
-  seed_num,
   train_index,
   sub_num,
   sub_portion,
@@ -17,8 +16,6 @@ ensemble_train_partition(
 }
 \arguments{
 \item{df}{Data frame}
-
-\item{seed_num}{Seed}
 
 \item{train_index}{Overall train indices}
 
@@ -33,7 +30,7 @@ ensemble_train_partition(
 \item{negative}{Negative class label}
 }
 \value{
-List of index vectors
+A list contain sub_num number of training index
 }
 \description{
 Create ensemble training subsets with stratified sampling & bootstrapping

@@ -10,7 +10,7 @@ check_na_zero(df)
 \item{df}{Data frame to check}
 }
 \value{
-Printed messages
+Zero Count
 }
 \description{
 Check NA and zero values in numeric columns

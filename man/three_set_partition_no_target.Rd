@@ -4,12 +4,10 @@
 \alias{three_set_partition_no_target}
 \title{Split Data into Train, Test, and Validation Sets (No Target Stratification)}
 \usage{
-three_set_partition_no_target(df, seed_num, train_portion, test_portion)
+three_set_partition_no_target(df, train_portion, test_portion)
 }
 \arguments{
 \item{df}{A data frame.}
-
-\item{seed_num}{Integer seed for reproducibility.}
 
 \item{train_portion}{Proportion of rows used for training.}
 
@@ -17,8 +15,7 @@ three_set_partition_no_target(df, seed_num, train_portion, test_portion)
 the remaining go to validation).}
 }
 \value{
-A list with elements \code{train_index}, \code{test_index},
-and \code{validation_index}.
+A list contain Training Index, Test Index & Validation Index (no stratification)
 }
 \description{
 Randomly splits a data frame into train, test, and validation sets using

@@ -7,12 +7,12 @@
 IQR_outlier(df, variables)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{Data frame with Outliers}
 
-\item{variables}{Character vector of numeric variable names}
+\item{variables}{Features in Data Frame that need outlier Treatment}
 }
 \value{
-Data frame with outliers capped
+Return data frame with variables' outliers treated
 }
 \description{
 IQR-based outlier treatment with capping at 5\% / 95\% quantiles

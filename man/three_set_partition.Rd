@@ -6,7 +6,6 @@
 \usage{
 three_set_partition(
   df,
-  seed_num,
   target_col,
   train_portion,
   test_portion,
@@ -15,19 +14,17 @@ three_set_partition(
 )
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{Data frame that used for partition}
 
-\item{seed_num}{Seed}
+\item{target_col}{Specific column that you don't want to fall in class imbalance (usually column used for prediction)}
 
-\item{target_col}{Target column name}
+\item{train_portion}{Portion of data select for training}
 
-\item{train_portion}{Train proportion}
+\item{test_portion}{Portion of data select for testing (rest for validation)}
 
-\item{test_portion}{Test proportion (of full data)}
+\item{positive}{Target column's positive value}
 
-\item{positive}{Positive class label}
-
-\item{negative}{Negative class label}
+\item{negative}{Target column's negative value}
 }
 \value{
 List with train_index, test_index, validation_index

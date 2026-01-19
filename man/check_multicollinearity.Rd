@@ -7,12 +7,12 @@
 check_multicollinearity(variables_df, threshold = 0.8)
 }
 \arguments{
-\item{variables_df}{Data frame of numeric variables}
+\item{variables_df}{Variables selected for multicollinearity checking (has to be numerical)}
 
-\item{threshold}{Correlation threshold to flag strong correlation}
+\item{threshold}{Above what correlation value is considered as strong correlation}
 }
 \value{
-Printed messages of strongly correlated pairs
+Nothing will return but will tell you what features are highly correlated
 }
 \description{
 Check multicollinearity via correlation matrix
