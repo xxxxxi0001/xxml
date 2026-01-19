@@ -51,6 +51,7 @@ make_ensemble_predict_numerical<-function (model_list,df,test_index,target_treat
 }
 
 #' Calculate How Each Ensemble Model should be weighted in Overall Model with RMSE
+#' 
 #' @param model_list The list of ensemble model
 #' @param df Data frame that you use to make prediction
 #' @param test_index The test index selected earlier
@@ -93,5 +94,37 @@ ensemble_weight_RMSE<-function(model_list,df,test_index,target_col,target_treatm
   
   # Return weight for later use
   return(as.list(weight_list))
+}
+
+#' Calculate How Each Ensemble Model should be weighted in Overall Model with RMSE
+#' 
+#' @param model_list The logistic regression model you create with your ensemble list
+#' @param df Data frame that you use to make prediction
+#' @param index The index you wanna try with this model (usually test & val index)
+#' @param weight_list The weight you get for each ensemble based on RMSE
+#' @param target_treatment If target column has been transformed, what method it use
+#' @return How each model should contribute to overall prediction
+#' @export
+emsemble_result_with_weight_numerical<-function(model_list,df,index,weight_list,target_treatment="none") {
+  
+  # Initialization
+  prediction_val<-list()
+  # Make prediction with each model and have them contribute differently based on weight
+  for (i in 1:length(model_list)) {
+    prediction_val[[i]]<-predict(model_list[[i]], df[index,], type="response")
+    prediction_val[[i]]<-prediction_val[[i]]*weight_list[[i]]
+  }
+  
+  # Calculate ensemble model's mean as final prediciton value
+  # If no transformation occur, return original value
+  # If transformation occured, return value that reversed back
+  if (tolower(target_treatment)=="none") {
+    ensemble_predictions<-Reduce("+",prediction_val)
+  }
+  else {
+    ensemble_predictions<-Reduce("+",prediction_val)
+    ensemble_predictions<-reverse_num(ensemble_predictions,target_treatment)
+  }
+  return(ensemble_predictions)
 }
 
