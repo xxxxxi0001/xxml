@@ -42,7 +42,7 @@ check_na_zero<-function(df){
 #' @param ignore_cols Zero value that does not need to be changed into NA
 #' @return Data frame with designated columns' zero value replaced into na
 #' @export
-replace_na_with_zero<-function(df,ignore_cols) {
+replace_zero_with_na<-function(df,ignore_cols) {
   
   # For only column that their zero value need to change into NA
   for (i in 1:ncol(df)) {
