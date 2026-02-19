@@ -33,7 +33,7 @@ zhang.xi6@northeastern.edu
 
 ### Data Splitting 
 - `three_set_partition()` — stratified train/test/validation split  
-- `ensemble_train_partition()` — partitions for bagging
+- `ensemble_train_partition()` — partitions for bag ensemble
 
 ### Class Imbalance
 - `check_class_imbalance()` - check if class imbalance occur
