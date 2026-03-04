@@ -101,14 +101,19 @@ df_LR$doubleRISK<-df_LR$MaxHR * df_LR$Oldpeak
 
 
 df_LR$Age_square<-(df_LR$Age)^2
+
 hist(df_LR$Age_square,prob=TRUE, main="Histogram of Age After", xlab="Age")
+
 lines(density(df_LR$Age_square, na.rm=TRUE))
 
 variables<-df_LR[,c("Age_square","RestingBP","Cholesterol","MaxHR","Oldpeak_square","doubleRISK_sqrt")]
+
 check_multicollinearity(variables)
 
 pca_results<-prcomp(df_LR[,c("Age_square","RestingBP","Cholesterol","MaxHR","Oldpeak_square","doubleRISK_sqrt")])
+
 summary(pca_results)
+
 pca_df<-as.data.frame(pca_results$x[,1:5])
 
 ### Partition dataset (50% train, 25% test, 25% val)
@@ -156,15 +161,19 @@ df <- automate_data_cleaning(df)
 
 ### Feature Engineering (Transformation, Multicollinearity, Normalization, One-Hot)
 df$DONATION_AMT_log<-log(df$DONATION_AMT)
+
 hist(df$DONATION_AMT_log,prob=TRUE, main="Histogram of Donation Amount After", xlab="Donor Age")
+
 lines(density(df$DONATION_AMT_log, na.rm=TRUE))
 
 variables<-df[,c("DONATION_AMT_log","DONOR_AGE","INCOME_LEVEL","SES","MEDIAN_HOME_VALUE_log","MEDIAN_HOUSEHOLD_INCOME_sqrt","DONATION_RESPONSE_sqrt1","MONTHS_SINCE_LAST_GIFT_square","EMAILS_12_log","LIFETIME_GIFT_COUNT_sqrt","LIFETIME_EMAILS_sqrt","LIFETIME_GIFT_AMOUNT_sqrt","LIFETIME_MAX_GIFT_AMT_sqrt","LIFETIME_MIN_GIFT_AMT_sqrt","LIFETIME_AVG_GIFT_AMT_sqrt")]
+
 check_multicollinearity(variables)
 
 df_scaled[col_numeric]<-scale(df[col_numeric==TRUE])
 
 onehot_features<-model.matrix(~URBANICITY+DONOR_GENDER+HOME_OWNER,data=df_scaled)
+
 onehot_df<-as.data.frame(onehot_features)[,-1]
 
 ### Partition (50,25,25)
