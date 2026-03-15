@@ -2,9 +2,11 @@ This package is designed to support **classification & regression modeling pipel
 
 ## ✨ Install from GitHub
 
+```text
 install.packages("devtools")
 
 devtools::install_github("xxxxxi0001/xxml")
+```
 
 ## ✨ Author E-mail
 zhang.xi6@northeastern.edu
