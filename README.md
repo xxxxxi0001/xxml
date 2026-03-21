@@ -2,7 +2,7 @@ This package is designed to support **classification & regression modeling pipel
 
 ## ✨ Install from GitHub
 
-```text
+```r
 install.packages("devtools")
 devtools::install_github("xxxxxi0001/xxml")
 ```
@@ -82,60 +82,73 @@ zhang.xi6@northeastern.edu
 ---
 
 ## ❤️ Usage Example (Categorical)
-
+```r
 library(xxml)
+```
 
 ### Load your data
+```r
 df <- read.csv("your_data.csv")
+```
 
 ### Basic NA / zero check
+```r
 check_na_zero(df)
+```
 
 ### Convert zero to NA for Cholesterol
+```r
 df <- replace_zero_with_na(df, ignore_cols = "Oldpeak")
+```
 
 ### One-Step Clean Data with Outlier & NA
+```r
 df <- automate_data_cleaning(df)
+```
 
 ### Feature Engineering (Derive New Feature, Transformation, Multicolineariality, PCA)
+```r
 df_LR$doubleRISK<-df_LR$MaxHR * df_LR$Oldpeak
 
 
 df_LR$Age_square<-(df_LR$Age)^2
-
 hist(df_LR$Age_square,prob=TRUE, main="Histogram of Age After", xlab="Age")
-
 lines(density(df_LR$Age_square, na.rm=TRUE))
 
 variables<-df_LR[,c("Age_square","RestingBP","Cholesterol","MaxHR","Oldpeak_square","doubleRISK_sqrt")]
-
 check_multicollinearity(variables)
 
 pca_results<-prcomp(df_LR[,c("Age_square","RestingBP","Cholesterol","MaxHR","Oldpeak_square","doubleRISK_sqrt")])
-
 summary(pca_results)
-
 pca_df<-as.data.frame(pca_results$x[,1:5])
+```
 
 ### Partition dataset (50% train, 25% test, 25% val)
+```r
 index <- three_set_partition(df, "HeartDisease", 0.5, 0.25, 1, 0)
 
 train_index <- index$train_index
-
 test_index  <- index$test_index
-
 val_index   <- index$validation_index
+```
 
 ### Fit logistic regression backward p
+```r
 log_models <- backward_p_lr(df, train_index, "HeartDisease", 1, 1, 1)
+```
 
 ### Ensemble prediction
+```r
 pred <- make_ensemble_predict(log_models, df, test_index, positive = 1)
+```
 
 ### Evaluate
+```r
 check_model_performance(pred, 0.5, 1, 0, df, test_index, "HeartDisease")
+```
 
 ### Tune with Best Threshold & Weight
+```r
 best_threshold<-find_best_threshold(ensemble_predictions,df_encoded_LR,test_index,"HeartDisease",1,0)
 
 weight_list<-ensemble_weight_F1(logistic_model_list,df_encoded_LR,test_index,best_threshold,"HeartDisease",1,0)
@@ -143,28 +156,37 @@ weight_list<-ensemble_weight_F1(logistic_model_list,df_encoded_LR,test_index,bes
 ensemble_predictions_val<-ensemble_result_with_weight(logistic_model_list,df_encoded_LR,validation_index,weight_list,1)
 
 result_ensemble<-check_model_performance(ensemble_predictions_val,best_threshold,1,0,df_encoded_LR,validation_index,"HeartDisease")
+```
 
 ## ❤️ Usage Example (Regression)
-
+```r
 library(xxml)
+```
 
 ### Load your data
+```r
 df <- read.csv("your_data.csv")
+```
 
 ### Basic NA / zero check
+```r
 check_na_zero(df)
+```
 
 ### Convert zero to NA for Cholesterol
+```r
 df <- replace_zero_with_na(df, ignore_cols = "Oldpeak")
+```
 
 ### One-Step Clean Data with Outlier & NA
+```r
 df <- automate_data_cleaning(df)
+```
 
 ### Feature Engineering (Transformation, Multicollinearity, Normalization, One-Hot)
+```r
 df$DONATION_AMT_log<-log(df$DONATION_AMT)
-
 hist(df$DONATION_AMT_log,prob=TRUE, main="Histogram of Donation Amount After", xlab="Donor Age")
-
 lines(density(df$DONATION_AMT_log, na.rm=TRUE))
 
 variables<-df[,c("DONATION_AMT_log","DONOR_AGE","INCOME_LEVEL","SES","MEDIAN_HOME_VALUE_log","MEDIAN_HOUSEHOLD_INCOME_sqrt","DONATION_RESPONSE_sqrt1","MONTHS_SINCE_LAST_GIFT_square","EMAILS_12_log","LIFETIME_GIFT_COUNT_sqrt","LIFETIME_EMAILS_sqrt","LIFETIME_GIFT_AMOUNT_sqrt","LIFETIME_MAX_GIFT_AMT_sqrt","LIFETIME_MIN_GIFT_AMT_sqrt","LIFETIME_AVG_GIFT_AMT_sqrt")]
@@ -174,29 +196,30 @@ check_multicollinearity(variables)
 df_scaled[col_numeric]<-scale(df[col_numeric==TRUE])
 
 onehot_features<-model.matrix(~URBANICITY+DONOR_GENDER+HOME_OWNER,data=df_scaled)
-
 onehot_df<-as.data.frame(onehot_features)[,-1]
+```
 
 ### Partition (50,25,25)
+```r
 set.seed(888)
-
 partition_result<-three_set_partition_no_target(df_encoded,0.5,0.25)
-
 train_index<-partition_result$train_index
-
 test_index<-partition_result$test_index
-
 validation_index<-partition_result$validation_index
-
+```
 ### Construction with Backward p
+```r
 mlr_list<-backward_p_mlr(df_encoded,train_partition_index,"DONATION_AMT_log")
+```
 
 ### Tune with Weight
+```r
 weight_list<-ensemble_weight_RMSE(mlr_list,df_encoded,test_index,"DONATION_AMT_log","log")
-
 prediction<-emsemble_result_with_weight(mlr_list,df_encoded,validation_index,weight_list,"log")
+```
 
 ### Check Result with RMSE & Correlation & Plot
+```r
 real_value<-exp(df_encoded[["DONATION_AMT_log"]][validation_index])
 
 rmse<-sqrt(mean((real_value-prediction)^2))
@@ -204,21 +227,20 @@ rmse<-sqrt(mean((real_value-prediction)^2))
 correlation<-cor(prediction,real_value)
 
 plot(prediction,real_value)
-
 abline(0,1, col=2)
-
+```
 ### Stack
+```r
 stack_model<-create_stack_model_mlr(df_encoded,"DONATION_AMT_log",test_index,mlr_list)
-
 result<-stack_test_mlr(stack_model,mlr_list,df_encoded,validation_index,"DONATION_AMT_log","log")
-
+```
 ### Check Stack Result (Correlation, plot)
+```r
 prediction_value<-result$prediction_value
-
 true_value<-result$true_value
 
 correlation<-cor(prediction_value,true_value)
 
 plot(prediction_value,true_value)
-
 abline(0,1, col=2)
+```
