@@ -17,7 +17,7 @@ check_na_zero<-function(df){
       # Add up add NA/zero value incase no zero/NA appear
       total_count<-na_count+total_count
       if (na_count>0) {
-        message("There are total", na_count ,"NA value in column", colnames(df)[i])
+        message("There are total ", na_count ," NA value in column ", colnames(df)[i])
         }
 
       # Count zero value, if appear, show which column has zero value
@@ -25,7 +25,7 @@ check_na_zero<-function(df){
       # Add up add NA/zero value incase no zero/NA appear
       total_count<-zero_count+total_count
       if (zero_count>0) {
-        message("There are total", zero_count, "Zero value in column", colnames(df)[i])
+        message("There are total ", zero_count, " Zero value in column ", colnames(df)[i])
         }
       }
     }
@@ -51,7 +51,7 @@ replace_zero_with_na<-function(df,ignore_cols) {
     # If their zero value is above 0, return result & change them into NA
     zero_count<-length(which(df[[i]] == 0))
     if (zero_count>0) {
-      message("Total", zero_count, "Zero value in column", colnames(df)[i],"has successfully changed into NA")
+      message("Total ", zero_count, " Zero value in column ", colnames(df)[i]," has successfully changed into NA")
       df[[i]][df[[i]]==0]<-NA
       }
     }
@@ -72,7 +72,7 @@ median_imputation<-function(df,target_col) {
     m_value<-median(df[[i]], na.rm=TRUE)
     df[[i]][is.na(df[[i]])]<-m_value
 
-    message("Feature",i,"is successfully imputated with median")
+    message("Feature ",i," is successfully imputated with median")
   }
 
   # return data frame
@@ -107,7 +107,7 @@ z_score_outlier<-function(df,variable) {
     df[[i]][z_v < -3]<-lower_b
 
     # Output result
-    message("Z-Score: There are total",outlier, "outliers detected for feature", i, ". Above upper boundary ", round(up_b,2), "is replaced into ", round(up_b,2), ". Below lower boundary", round(lower_b,2), "is replaced into", round(lower_b,2))
+    message("Z-Score: There are total ",outlier, " outliers detected for feature ", i, ". Above upper boundary ", round(up_b,2), " is replaced into ", round(up_b,2), ". Below lower boundary ", round(lower_b,2), " is replaced into ", round(lower_b,2))
   }
 
   # return data frame
@@ -143,7 +143,7 @@ IQR_outlier<-function(df,variables){
   # For above upper quatile repplaced by 95%
   df[[i]][df[[i]]>up_q]<-caps[2]
 
-  message("IQR: There are total",outlier, "outliers detected for feature", i, ". Above upper quartile ", up_q, "is replaced into ", caps[2], ". Below lower quartile", low_q, "is replaced into", caps[1])
+  message("IQR: There are total ",outlier, " outliers detected for feature ", i, ". Above upper quartile ", up_q, " is replaced into ", caps[2], ". Below lower quartile ", low_q, " is replaced into", caps[1])
   }
   return(df)
 }
@@ -185,7 +185,7 @@ check_multicollinearity<-function(variables_df, threshold=0.8) {
     # Threshold set as 0.8, you can change this feature
     # Return the result
     if (abs(cor_df[i,3])>=threshold & cor_df[i,1] != cor_df[i,2]) {
-      message("There is a strong correlational relationship (", round(as.numeric(cor_df[i,3]),2),") occur betewen",as.character(cor_df[i,1]),"and",as.character(cor_df[i,2]))
+      message("There is a strong correlational relationship (", round(as.numeric(cor_df[i,3]),2),") occur betewen ",as.character(cor_df[i,1])," and ",as.character(cor_df[i,2]))
       total_count<-total_count+1
     }
   }
@@ -303,7 +303,7 @@ find_best_k<-function(max_k,test_k_index,df_distance,not_na_index,target_feature
     }
   }
   # print out the best k we find and have its RMSE as additional value
-  message("The best k is", smallest_k,"which give smallest error of", smallest_RMSE)
+  message("The best k is ", smallest_k," which give smallest error of ", round(smallest_RMSE,4))
 
   # remove temporary vector
   rm(df_temp,total_distance)
@@ -372,10 +372,10 @@ automation_knn_imputation<-function(df,test_por=0.1,max_k=20,ignore_col=NULL) {
     df_distance<-initialize_distance_find_best_k(df)
     not_na_index<-initialize_not_na_index(target_feature)
     test_k_index<-initialize_test_k_index(test_por,not_na_index)
-    message("Now is processing column",i)
+    message("Now is processing column ",i)
     smallest_k<-find_best_k(max_k,test_k_index,df_distance,not_na_index,target_feature)
     df[[i]]<-kNN_Imputation(df,smallest_k,target_feature,df_distance)
-    message("Feature",i,"is successfully imputed with kNN.")
+    message("Feature ",i," is successfully imputed with kNN.")
 
     # Remove unncessary information to release storage
     rm(df_distance)
@@ -407,7 +407,7 @@ automate_data_cleaning<-function(df) {
     # If na occurs more then 30%, remove column
     else if (na_por>0.3) {
       drop_index<-c(drop_index, i)
-      message("Feature",colnames(df)[i],"has more than 30% missing value, need to be droped")
+      message("Feature ",colnames(df)[i]," has more than 30% missing value, need to be droped.")
     }
   }
   if (length(drop_index)>0) {
