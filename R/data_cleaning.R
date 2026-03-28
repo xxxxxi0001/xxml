@@ -143,7 +143,7 @@ IQR_outlier<-function(df,variables){
   # For above upper quatile repplaced by 95%
   df[[i]][df[[i]]>up_q]<-caps[2]
 
-  message("IQR: There are total ",outlier, " outliers detected for feature ", i, ". Above upper quartile ", up_q, " is replaced into ", caps[2], ". Below lower quartile ", low_q, " is replaced into", caps[1])
+  message("IQR: There are total ",outlier, " outliers detected for feature ", i, ". Above upper quartile ", up_q, " is replaced into ", caps[2], ". Below lower quartile ", low_q, " is replaced into ", caps[1])
   }
   return(df)
 }
